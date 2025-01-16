@@ -5,8 +5,9 @@ import os
 import uuid
 import zipfile
 import psutil
-import json
 from werkzeug.utils import secure_filename
+from prometheus_client import start_http_server, Counter, Histogram
+import time
 
 app = Flask(__name__)
 client = docker.from_env()
@@ -22,6 +23,10 @@ os.makedirs(EXTRACT_FOLDER, exist_ok=True)
 # Store running containers and their ports
 deployments = {}
 
+# Prometheus metrics
+REQUEST_COUNT = Counter('api_requests_total', 'Total API requests', ['method', 'endpoint'])
+REQUEST_LATENCY = Histogram('api_request_latency_seconds', 'API request latency')
+
 def find_available_port():
     """Find the next available port in the range"""
     used_ports = set(deployments.values())
@@ -30,63 +35,43 @@ def find_available_port():
             return port
     raise Exception("No ports available")
 
-def extract_zip(zip_path, extract_path):
-    """Extract uploaded zip file"""
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_path)
-
-def clone_repository(repo_url, extract_path):
-    """Clone a git repository"""
-    git.Repo.clone_from(repo_url, extract_path)
-
-def build_and_run_container(project_path, deployment_id):
-    """Build and run Docker container for the project"""
-    # Build the image
-    image, _ = client.images.build(
-        path=project_path,
-        tag=f"api-deployment-{deployment_id}",
-        rm=True
-    )
-
-    # Get available port
-    port = find_available_port()
-
-    # Run the container
-    container = client.containers.run(
-        image.id,
-        detach=True,
-        ports={'8080/tcp': port},
-        name=f"api-deployment-{deployment_id}"
-    )
-
-    return container, port
-
 @app.route('/deploy', methods=['POST'])
+@REQUEST_LATENCY.time()
 def deploy():
+    REQUEST_COUNT.labels(method='POST', endpoint='/deploy').inc()
     try:
         deployment_id = str(uuid.uuid4())
         extract_path = os.path.join(EXTRACT_FOLDER, deployment_id)
         os.makedirs(extract_path, exist_ok=True)
 
         if 'file' in request.files:
-            # Handle ZIP file upload
             file = request.files['file']
             if file.filename.endswith('.zip'):
                 zip_path = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
                 file.save(zip_path)
-                extract_zip(zip_path, extract_path)
-                os.remove(zip_path)  # Clean up zip file
+                with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                    zip_ref.extractall(extract_path)
+                os.remove(zip_path)
         elif 'repository' in request.json:
-            # Handle Git repository
             repo_url = request.json['repository']
-            clone_repository(repo_url, extract_path)
+            git.Repo.clone_from(repo_url, extract_path)
         else:
             return jsonify({'error': 'No file or repository provided'}), 400
 
-        # Build and run container
-        container, port = build_and_run_container(extract_path, deployment_id)
+        port = find_available_port()
+        image, _ = client.images.build(
+            path=extract_path,
+            tag=f"api-deployment-{deployment_id}",
+            rm=True
+        )
         
-        # Store deployment info
+        container = client.containers.run(
+            image.id,
+            detach=True,
+            ports={'8080/tcp': port},
+            name=f"api-deployment-{deployment_id}"
+        )
+        
         deployments[deployment_id] = port
 
         return jsonify({
@@ -100,10 +85,12 @@ def deploy():
 
 @app.route('/deployments', methods=['GET'])
 def list_deployments():
+    REQUEST_COUNT.labels(method='GET', endpoint='/deployments').inc()
     return jsonify(deployments)
 
 @app.route('/deployment/<deployment_id>', methods=['GET'])
 def get_deployment(deployment_id):
+    REQUEST_COUNT.labels(method='GET', endpoint='/deployment').inc()
     if deployment_id not in deployments:
         return jsonify({'error': 'Deployment not found'}), 404
 
@@ -127,6 +114,7 @@ def get_deployment(deployment_id):
 
 @app.route('/deployment/<deployment_id>', methods=['DELETE'])
 def delete_deployment(deployment_id):
+    REQUEST_COUNT.labels(method='DELETE', endpoint='/deployment').inc()
     if deployment_id not in deployments:
         return jsonify({'error': 'Deployment not found'}), 404
 
@@ -140,4 +128,6 @@ def delete_deployment(deployment_id):
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
+    # Start up the server to expose Prometheus metrics
+    # start_http_server(8000)
     app.run(host='0.0.0.0', port=5000)

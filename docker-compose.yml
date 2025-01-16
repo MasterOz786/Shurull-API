@@ -8,9 +8,11 @@ services:
       - "5000:5000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.ssh:/root/.ssh
     environment:
-      - PROMETHEUS_MULTIPROC_DIR=/tmp
       - ENVIRONMENT=production
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - SSH_AUTH_SOCK=/root/.ssh/auth.sock
     logging:
       driver: "json-file"
       options:
@@ -32,28 +34,8 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-
-  alertmanager:
-    image: prom/alertmanager
-    container_name: shurull_alertmanager
-    ports:
-      - "9093:9093"
-    volumes:
-      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
-
-  grafana:
-    image: grafana/grafana
-    container_name: shurull_grafana
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
-      - GF_SERVER_ROOT_URL=https://grafana.shurull-api.com
-    volumes:
-      - grafana-storage:/var/lib/grafana
 
   node-exporter:
     image: prom/node-exporter
@@ -76,43 +58,3 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
-    container_name: shurull_elasticsearch
-    environment:
-      - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ports:
-      - "9200:9200"
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.14.0
-    container_name: shurull_kibana
-    ports:
-      - "5601:5601"
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    depends_on:
-      - elasticsearch
-
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:7.14.0
-    container_name: shurull_filebeat
-    user: root
-    volumes:
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    depends_on:
-      - elasticsearch
-
-volumes:
-  grafana-storage:
-  elasticsearch-data:
