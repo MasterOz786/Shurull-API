@@ -9,5 +9,7 @@ ssh-add ~/.ssh/github_actions
 # Verify the SSH connection (optional, for debugging)
 ssh -T git@github.com
 
-# Run the Flask application
-python app.py
+# Run the Flask application with logging to stdout
+export FLASK_APP=app.py
+export FLASK_ENV=production  # Use production mode
+flask run --host=0.0.0.0

@@ -1,0 +1,17 @@
+# Elasticsearch
+ELASTIC_PASSWORD=<elastic_user_password>
+KIBANA_SYSTEM_PASSWORD=<kibana_system_password>
+BEATS_SYSTEM_PASSWORD=<beats_system_password>
+
+# Grafana
+GRAFANA_ADMIN_PASSWORD=<grafana_password>
+
+# Prometheus
+PROMETHEUS_ADMIN_PASSWORD=<prometheus_password>
+
+# AlertManager
+ALERTMANAGER_CONFIG_HASH=<alertmanager_hash>
+
+# Slack
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/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
+

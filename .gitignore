@@ -171,3 +171,6 @@ cython_debug/
 .pypirc
 
 **/node_modules/
+
+pnpm-lock.yaml
+package-lock.json
