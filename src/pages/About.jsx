@@ -8,9 +8,11 @@ export default function About() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
       >
-        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-          About Shurull API
-        </h2>
+        <h1 className="text-4xl sm:text-5xl font-bold mb-4">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+            About Shurull API
+          </span>
+        </h1>
         <p className="mt-4 text-xl text-gray-300">
           Empowering developers with seamless API deployment and management
         </p>
@@ -23,7 +25,7 @@ export default function About() {
           transition={{ delay: 0.2 }}
           className="bg-gray-800 bg-opacity-50 backdrop-blur-lg rounded-xl p-8 border border-gray-700"
         >
-          <h3 className="text-2xl font-semibold mb-4">Our Mission</h3>
+          <h3 className="text-2xl font-semibold mb-4 text-white">Our Mission</h3>
           <p className="text-gray-300">
             At Shurull API, we're committed to simplifying the API deployment process for developers.
             Our platform provides a robust, scalable solution that allows teams to focus on building
@@ -37,7 +39,7 @@ export default function About() {
           transition={{ delay: 0.4 }}
           className="bg-gray-800 bg-opacity-50 backdrop-blur-lg rounded-xl p-8 border border-gray-700"
         >
-          <h3 className="text-2xl font-semibold mb-4">Why Choose Us</h3>
+          <h3 className="text-2xl font-semibold mb-4 text-white">Why Choose Us</h3>
           <ul className="space-y-4 text-gray-300">
             <li>• Instant deployment with GitHub integration</li>
             <li>• Real-time monitoring and analytics</li>
@@ -52,9 +54,9 @@ export default function About() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="mt-16 text-center"
+        className="mt-16"
       >
-        <h3 className="text-2xl font-semibold mb-6">Our Technology Stack</h3>
+        <h3 className="text-2xl font-semibold mb-6 text-center text-white">Our Technology Stack</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
           {technologies.map((tech, index) => (
             <div

@@ -8,13 +8,15 @@ import About from './pages/About';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
         <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/deploy" element={<Deploy />} />
-          <Route path="/about" element={<About />} />
-        </Routes>
+        <main className="flex-grow pt-16">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/deploy" element={<Deploy />} />
+            <Route path="/about" element={<About />} />
+          </Routes>
+        </main>
         <Footer />
       </div>
     </Router>
