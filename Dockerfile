@@ -12,9 +12,10 @@ RUN apt-get update && \
     openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Add GitHub's SSH key to known_hosts
+# Create the .ssh directory and add GitHub to known_hosts
 RUN mkdir -p /root/.ssh && \
-    ssh-keyscan github.com >> /root/.ssh/known_hosts
+    ssh-keyscan github.com >> /root/.ssh/known_hosts && \
+    chmod 700 /root/.ssh
 
 # Copy requirements first for better caching
 COPY requirements.txt .
@@ -26,8 +27,12 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p uploads extracted
 
+# Copy the startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
 # Expose the port the app runs on
 EXPOSE 5000
 
-# Command to run the application
-CMD ["python", "app.py"]
+# Command to run the startup script
+CMD ["/start.sh"]
