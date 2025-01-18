@@ -50,7 +50,7 @@ jobs:
 
   deploy-staging:
     needs: build
-    if: github.ref == 'refs/heads/main'  # Use 'develop' for staging
+    if: github.ref == 'refs/heads/develop'  # Use 'develop' for staging
     runs-on: ubuntu-latest
     steps:
       - name: Check if SSH private key is set
@@ -91,5 +91,5 @@ jobs:
             cd /home/ubuntu/Shurulls/Shurull-API
             git fetch --all
             git reset --hard origin/main
-            docker-compose down  # Stop and remove existing containers
-            docker-compose up -d --build  # Start new containers
+            docker compose down  # Stop and remove existing containers
+            docker compose up -d --build  # Start new containers

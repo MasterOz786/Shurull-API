@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import docker
 import git
 import os
@@ -16,6 +17,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+CORS(app, origins=['https://shurull.pro', '*'])
 client = docker.from_env()
 
 # Configuration
@@ -95,7 +97,7 @@ def deploy():
             ports={'5001/tcp': port},  # Map container port 5001 to the unique host port
             name=f"api-deployment-{deployment_id}"
         )
-        
+
         deployments[deployment_id] = port
 
         logger.info(f"Deployment successful! Deployment ID: {deployment_id}, Port: {port}")
@@ -112,6 +114,10 @@ def deploy():
 @app.route('/deployments', methods=['GET'])
 def list_deployments():
     REQUEST_COUNT.labels(method='GET', endpoint='/deployments').inc()
+    if (len(deployments) == 0):
+        logger.info("No deployments found")
+        return jsonify({'info': 'No deployments found'}), 204
+    
     logger.info("Listing all deployments")
     return jsonify(deployments)
 
