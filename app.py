@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app, origins=['https://shurull.pro', '*'])
+CORS(app, origins=['https://shurulls.pro', '*'])
 client = docker.from_env()
 
 # Configuration
@@ -116,7 +116,7 @@ def list_deployments():
     REQUEST_COUNT.labels(method='GET', endpoint='/deployments').inc()
     if (len(deployments) == 0):
         logger.info("No deployments found")
-        return jsonify({'info': 'No deployments found'}), 204
+        return jsonify({'info': 'No deployments found'})
     
     logger.info("Listing all deployments")
     return jsonify(deployments)
