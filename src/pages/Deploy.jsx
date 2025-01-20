@@ -45,13 +45,13 @@ export default function Deploy() {
     }
   };
 
-  const deployFromGithub = async (url) => {
+  const deployFromGithub = async (url, email = "hassanejaz400@gmail.com") => {
     const response = await fetch('http://15.235.184.251:5000/deploy', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ repository: url }),
+      body: JSON.stringify({ repository: url, email: email }),
     });
     return response;
   };

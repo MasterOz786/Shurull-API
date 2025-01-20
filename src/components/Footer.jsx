@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-              Shurull API
+              Shurulls API
             </h3>
             <p className="mt-4 text-gray-400">
               Empowering developers with seamless API deployment and management solutions.
@@ -38,9 +38,9 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold text-white mb-4">Contact</h4>
             <ul className="space-y-2 text-gray-400">
-              <li>Email: support@shurull.com</li>
-              <li>Phone: +1 (555) 123-4567</li>
-              <li>Location: Silicon Valley, CA</li>
+              <li>Email: support@shurulls.pro</li>
+              <li>Phone: +92 3266509063</li>
+              <li>Location: Islamabad, PK</li>
             </ul>
           </div>
         </div>
