@@ -7,22 +7,64 @@ export default function Deploy() {
   const [deployMethod, setDeployMethod] = useState('github');
   const [githubUrl, setGithubUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState(null);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       'application/zip': ['.zip']
     },
     onDrop: (acceptedFiles) => {
-      console.log(acceptedFiles);
-      // Handle file upload
+      setUploadedFile(acceptedFiles[0]);
     }
   });
 
   const handleDeploy = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Add deployment logic here
-    setTimeout(() => setIsLoading(false), 2000);
+
+    try {
+      let response;
+      if (deployMethod === 'github') {
+        response = await deployFromGithub(githubUrl);
+      } else {
+        response = await deployFromZip(uploadedFile);
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Deployment successful! Deployment ID: ${data.deployment_id}, Port: ${data.port}`);
+      } else {
+        const errorData = await response.json();
+        alert(`Deployment failed: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('Error during deployment:', error);
+      alert('An error occurred during deployment.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deployFromGithub = async (url) => {
+    const response = await fetch('http://15.235.184.251:5000/deploy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ repository: url }),
+    });
+    return response;
+  };
+
+  const deployFromZip = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch('http://15.235.184.251:5000/deploy', {
+      method: 'POST',
+      body: formData,
+    });
+    return response;
   };
 
   return (
