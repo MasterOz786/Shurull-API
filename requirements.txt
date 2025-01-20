@@ -21,3 +21,5 @@ smmap==5.0.2
 urllib3==2.3.0
 websocket-client==1.8.0
 Werkzeug==2.0.1
+pymongo==4.6.1
+python-json-logger==2.0.7

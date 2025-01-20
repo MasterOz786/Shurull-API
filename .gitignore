@@ -174,3 +174,7 @@ cython_debug/
 
 pnpm-lock.yaml
 package-lock.json
+
+# Container Images
+
+/extracted/

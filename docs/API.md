@@ -10,98 +10,99 @@ Shurull API is a platform that enables users to deploy their APIs (Node.js, Flas
 http://15.235.184.251:5000
 ```
 
-## Authentication
-
-Currently, the API does not require authentication. This should be implemented in production.
-
 ## API Endpoints
 
 ### 1. Deploy API
-**POST** `/deployments`
+**POST** `/deploy`
 
-Deploy a new API from a ZIP file or GitHub repository.
+Queue a new API deployment from a ZIP file or GitHub repository.
 
 #### Request Body
-- Form Data:
-  - `file`: ZIP file containing the API project
-  OR
 - JSON:
   ```json
   {
+    "email": "user@example.com",
     "repository": "https://github.com/username/repo"
   }
   ```
+  OR
+- Form Data:
+  - `email`: User's email address
+  - `file`: ZIP file containing the API project
 
 #### Success Response
 ```json
 {
+  "message": "Deployment request received and queued",
   "deployment_id": "550e8400-e29b-41d4-a716-446655440000",
-  "port": 3000,
-  "status": "running"
+  "status": "queued"
 }
 ```
 Status Code: 200
 
-#### Error Response
-```json
-{
-  "error": "No file or repository provided"
-}
-```
-Status Code: 400
-
-### 2. List Deployments
+### 2. List All Deployments
 **GET** `/deployments`
 
-Retrieve all active deployments.
+Get all deployments, optionally filtered by email.
+
+#### Query Parameters
+- `email` (optional): Filter deployments by user email
 
 #### Success Response
 ```json
 {
-  "550e8400-e29b-41d4-a716-446655440000": 3000,
-  "660e8400-e29b-41d4-a716-446655440001": 3001
+  "deployments": [
+    {
+      "deployment_id": "550e8400-e29b-41d4-a716-446655440000",
+      "email": "user@example.com",
+      "status": "completed",
+      "created_at": 1705743600,
+      "port": 3000
+    }
+  ],
+  "count": 1
 }
 ```
 Status Code: 200
 
-### 3. Get Deployment Details
-**GET** `/deployments/{deployment_id}`
+### 3. Get User Deployments
+**GET** `/deployments/user/{email}`
 
-Get details and metrics for a specific deployment.
+Get all deployments for a specific user.
+
+#### Success Response
+```json
+{
+  "email": "user@example.com",
+  "deployments": [
+    {
+      "deployment_id": "550e8400-e29b-41d4-a716-446655440000",
+      "status": "completed",
+      "created_at": 1705743600,
+      "port": 3000
+    }
+  ],
+  "count": 1
+}
+```
+Status Code: 200
+
+### 4. Get Deployment Status
+**GET** `/deployment/{deployment_id}/status`
+
+Get the current status of a queued deployment.
 
 #### Success Response
 ```json
 {
   "deployment_id": "550e8400-e29b-41d4-a716-446655440000",
-  "port": 3000,
-  "status": "running",
-  "stats": {
-    "cpu_usage": 1234567,
-    "memory_usage": 8912345,
-    "network_rx": 1234,
-    "network_tx": 5678
-  }
-}
-```
-Status Code: 200
-
-#### Error Response
-```json
-{
-  "error": "Deployment not found"
-}
-```
-Status Code: 404
-
-### 4. Delete Deployment
-**DELETE** `/deployments/{deployment_id}`
-
-Remove a deployment and stop its container.
-
-#### Success Response
-```json
-{
-  "status": "deleted"
+  "email": "user@example.com",
+  "status": "queued|processing|completed|failed",
+  "queued_at": "2024-01-20T10:00:00.000Z",
+  "started_at": "2024-01-20T10:00:05.000Z",
+  "completed_at": "2024-01-20T10:00:10.000Z",
+  "error": null,
+  "port": 3000
 }
 ```
 Status Code: 200
