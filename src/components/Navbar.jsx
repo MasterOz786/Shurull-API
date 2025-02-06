@@ -1,10 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
-// Memoized link components to prevent unnecessary re-renders
-const NavLink = ({ to, children }) => {
+// Memoized link components
+const NavLink = memo(({ to, children }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
 
@@ -20,9 +20,9 @@ const NavLink = ({ to, children }) => {
       {children}
     </Link>
   );
-}
+});
 
-const MobileNavLink = ({ to, children, onClick }) => {
+const MobileNavLink = memo(({ to, children, onClick }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
 
@@ -39,29 +39,58 @@ const MobileNavLink = ({ to, children, onClick }) => {
       {children}
     </Link>
   );
-}
+});
+
+// Memoized menu button
+const MenuButton = memo(({ isOpen, onClick }) => (
+  <button
+    onClick={onClick}
+    className="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none transition-colors duration-300"
+    aria-expanded={isOpen}
+    aria-controls="mobile-menu"
+    aria-label="Main menu"
+  >
+    <span className="sr-only">Open main menu</span>
+    {isOpen ? (
+      <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+    ) : (
+      <Bars3Icon className="h-5 w-5" aria-hidden="true" />
+    )}
+  </button>
+));
+
+// Memoized logo
+const Logo = memo(() => (
+  <Link 
+    to="/" 
+    className="flex items-center"
+    aria-label="Home"
+  >
+    <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 hover:from-purple-500 hover:to-pink-700 transition-all duration-300">
+      Shurulls
+    </span>
+  </Link>
+));
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
 
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+  // Memoized scroll handler
+  const handleScroll = useCallback(() => {
+    setIsScrolled(window.scrollY > 20);
   }, []);
 
-  // Close menu on route change
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
 
-  // Memoized toggle handler
   const toggleMenu = useCallback(() => {
     setIsOpen(prev => !prev);
   }, []);
@@ -74,18 +103,8 @@ export default function Navbar() {
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link 
-            to="/" 
-            className="flex items-center"
-            aria-label="Home"
-          >
-            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 hover:from-purple-500 hover:to-pink-700 transition-all duration-300">
-              Shurulls
-            </span>
-          </Link>
+          <Logo />
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center">
             <div className="flex items-center space-x-2 bg-gray-800/50 rounded-lg backdrop-blur-sm p-1">
               <NavLink to="/">Home</NavLink>
@@ -94,25 +113,10 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={toggleMenu}
-            className="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none transition-colors duration-300"
-            aria-expanded={isOpen}
-            aria-controls="mobile-menu"
-            aria-label="Main menu"
-          >
-            <span className="sr-only">Open main menu</span>
-            {isOpen ? (
-              <XMarkIcon className="h-5 w-5" aria-hidden="true" />
-            ) : (
-              <Bars3Icon className="h-5 w-5" aria-hidden="true" />
-            )}
-          </button>
+          <MenuButton isOpen={isOpen} onClick={toggleMenu} />
         </div>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div

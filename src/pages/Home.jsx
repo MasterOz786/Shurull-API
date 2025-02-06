@@ -1,7 +1,7 @@
-import { memo, useMemo, lazy, Suspense } from 'react';
+import { memo, useMemo, lazy, Suspense, useEffect } from 'react';
 import { motion, LazyMotion, domAnimation } from 'framer-motion';
 import { TypeAnimation } from 'react-type-animation';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   ArrowRightIcon,
   CloudArrowUpIcon,
@@ -49,6 +49,13 @@ const features = [
 ];
 
 export default function Home() {
+  const location = useLocation();
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <LazyMotion features={domAnimation}>
       <div className="relative min-h-screen">
@@ -146,7 +153,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* CTA Section */}
+        {/* CTA Section - Reduced top padding */}
         <div className="relative z-10 bg-gray-900/50 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <motion.div
