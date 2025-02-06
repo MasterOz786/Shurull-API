@@ -1,21 +1,59 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+
+// Memoized link components to prevent unnecessary re-renders
+const NavLink = ({ to, children }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+
+  return (
+    <Link
+      to={to}
+      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+        isActive
+          ? 'text-white bg-gray-700'
+          : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
+
+const MobileNavLink = ({ to, children, onClick }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      className={`block px-3 py-2 rounded-lg text-base font-medium transition-colors ${
+        isActive 
+          ? 'bg-gray-800 text-white' 
+          : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
+  // Close menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
   // Memoized toggle handler
   const toggleMenu = useCallback(() => {
     setIsOpen(prev => !prev);
   }, []);
-
-  // Close menu on route change
-  if (isOpen && location.pathname) {
-    setIsOpen(false);
-  }
 
   return (
     <nav className="fixed w-full z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800/50">
@@ -71,49 +109,13 @@ export default function Navbar() {
             className="md:hidden border-t border-gray-800/50 bg-gray-900/95 backdrop-blur-sm"
           >
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <MobileNavLink to="/">Home</MobileNavLink>
-              <MobileNavLink to="/deploy">Deploy</MobileNavLink>
-              <MobileNavLink to="/about">About</MobileNavLink>
+              <MobileNavLink to="/" onClick={toggleMenu}>Home</MobileNavLink>
+              <MobileNavLink to="/deploy" onClick={toggleMenu}>Deploy</MobileNavLink>
+              <MobileNavLink to="/about" onClick={toggleMenu}>About</MobileNavLink>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </nav>
-  );
-}
-
-const NavLink = ({ to, children }) => {
-  const location = useLocation();
-  const isActive = location.pathname === to;
-
-  return (
-    <Link
-      to={to}
-      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-        isActive
-          ? 'text-white bg-gray-700'
-          : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-      }`}
-    >
-      {children}
-    </Link>
-  );
-}
-
-const MobileNavLink = ({ to, children }) => {
-  const location = useLocation();
-  const isActive = location.pathname === to;
-
-  return (
-    <Link
-      to={to}
-      className={`block px-3 py-2 rounded-lg text-base font-medium transition-colors ${
-        isActive 
-          ? 'bg-gray-800 text-white' 
-          : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
-      }`}
-    >
-      {children}
-    </Link>
   );
 }
