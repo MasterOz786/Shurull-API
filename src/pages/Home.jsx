@@ -27,7 +27,7 @@ const stats = [
   { value: '99.9%', label: 'Uptime' },
   { value: '150ms', label: 'Avg. Latency' },
   { value: '24/7', label: 'Support' },
-  { value: '5', label: 'APIs Deployed' }
+  { value: '5+', label: 'APIs Deployed' }
 ];
 
 const features = [
@@ -49,20 +49,9 @@ const features = [
 ];
 
 export default function Home() {
-  // Memoize static content
-  const backgroundBlobs = useMemo(() => (
-    <div className="absolute inset-0 z-0">
-      <div className="absolute top-0 -left-4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
-      <div className="absolute top-0 -right-4 w-96 h-96 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-8 left-20 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
-    </div>
-  ), []);
-
   return (
     <LazyMotion features={domAnimation}>
-      <div className="relative min-h-screen overflow-hidden">
-        {backgroundBlobs}
-
+      <div className="relative min-h-screen">
         {/* Hero Section */}
         <div className="relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 sm:pt-24 sm:pb-20">
@@ -130,10 +119,10 @@ export default function Home() {
         </div>
 
         {/* Features Section */}
-        <div id="features" className="relative z-10 bg-gray-900/50 backdrop-blur-sm py-24">
+        <div id="features" className="relative z-10 bg-gray-900/50 backdrop-blur-sm py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
-              className="text-center mb-16"
+              className="text-center mb-12"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -157,17 +146,17 @@ export default function Home() {
           </div>
         </div>
 
-        {/* CTA Section - Reduced Spacing */}
-        <div className="relative z-10 py-12 bg-gradient-to-b from-transparent to-gray-900/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* CTA Section */}
+        <div className="relative z-10 bg-gray-900/50 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <motion.div
-              className="text-center bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50"
+              className="text-center bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 shadow-xl overflow-visible"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-4">
+              <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-4 leading-tight">
                 Ready to Get Started?
               </h2>
               <p className="text-lg text-gray-300 mb-6 max-w-2xl mx-auto">
