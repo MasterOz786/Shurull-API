@@ -26,12 +26,14 @@ def create_deployment():
         # Build and run container
         image = docker_service.build_image(project_handler.get_project_path(deployment_id), deployment_id)
         container = docker_service.run_container(image.id, deployment_id, port)
-        
+        # Get the public URL for the container
+        deployment_url = docker_service.get_container_url(deployment_id, port)
         port_manager.assign_port(deployment_id, port)
         
         return jsonify({
             'deployment_id': deployment_id,
-            'port': port,
+            'port': port,   
+            'url': deployment_url,
             'status': 'running'
         })
 
@@ -54,11 +56,14 @@ def get_deployment(deployment_id):
 
     try:
         container = docker_service.client.containers.get(f"api-deployment-{deployment_id}")
+        port = port_manager.get_port(deployment_id)
+        deployment_url = docker_service.get_container_url(deployment_id, port)
         stats = docker_service.get_container_stats(container)
         
         return jsonify({
             'deployment_id': deployment_id,
             'port': port_manager.get_port(deployment_id),
+            'url': deployment_url,
             'status': container.status,
             'stats': stats
         })

@@ -11,5 +11,5 @@ ssh -T git@github.com
 
 # Run the Flask application with logging to stdout
 export FLASK_APP=app.py
-export FLASK_ENV=production  # Use production mode
+export FLASK_ENV=development  # Use production mode
 flask run --host=0.0.0.0

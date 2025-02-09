@@ -109,7 +109,7 @@ class DeploymentQueue:
         container = self.docker_client.containers.run(
             image.id,
             detach=True,
-            ports={'8080/tcp': port},
+            ports={f'{port}/tcp': port},
             name=f"api-deployment-{deployment_id}",
             environment={
                 "PROMETHEUS_MULTIPROC_DIR": "/tmp",
@@ -122,18 +122,20 @@ class DeploymentQueue:
 
     def _find_available_port(self, start_port=3000, end_port=4000):
         logger.debug("Searching for available port")
-        used_ports = set(
-            int(container.ports.get('8080/tcp')[0]['HostPort'])
-            for container in self.docker_client.containers.list()
-            if container.ports and '8080/tcp' in container.ports
-        )
-        
+        used_ports = set()
+        for container in self.docker_client.containers.list():
+            if container.ports:
+                for mappings in container.ports.values():
+                    if mappings is not None:
+                        for mapping in mappings:
+                            used_ports.add(int(mapping['HostPort']))
+                            
         for port in range(start_port, end_port + 1):
             if port not in used_ports:
                 logger.info(f"Found available port: {port}")
                 return port
-        raise Exception("No available ports in the specified range")
-
+        logger.error("No available ports in the specified range")
+        
     def _process_queue(self):
         while self.processing:
             try:

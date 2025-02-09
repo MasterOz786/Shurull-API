@@ -130,7 +130,7 @@ export default function Deploy() {
   }, []);
 
   const deployFromGithub = useCallback(async (url, deploymentData) => {
-    const response = await fetch('http://15.235.184.251:5000/deploy', {
+    const response = await fetch(`${import.meta.env.VITE_MAZDOORI_BASEURL}:${import.meta.env.VITE_FLASK_PORT}/deploy`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ export default function Deploy() {
       formData.append(key, value);
     });
 
-    const response = await fetch('http://15.235.184.251:5000/deploy', {
+    const response = await fetch(`${import.meta.env.VITE_MAZDOORI_BASEURL}:${import.meta.env.VITE_FLASK_PORT}/deploy`, {
       method: 'POST',
       body: formData,
     });
@@ -175,7 +175,9 @@ export default function Deploy() {
       const data = await response.json();
       
       if (response.ok) {
-        setDeploymentMessage(`Deployment successful! Your deployment ID is ${data.deployment_id}`);
+        setDeploymentMessage(
+          `Deployment successful! Your API is available at: ${data.url}`
+        );
         setShowSuccessAlert(true);
       } else {
         throw new Error(data.error || 'Deployment failed');

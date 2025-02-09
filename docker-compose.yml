@@ -13,10 +13,13 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.ssh:/root/.ssh
+      - /var/lib/mongodb:/data/db
     environment:
-      - ENVIRONMENT=production
+      - ENVIRONMENT=development
       - DOCKER_HOST=unix:///var/run/docker.sock
       - SSH_AUTH_SOCK=/root/.ssh/auth.sock
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     logging:
       driver: "json-file"
       options:

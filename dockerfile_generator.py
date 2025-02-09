@@ -20,18 +20,20 @@ class DockerfileGenerator:
     def get_dockerfile_template(self, project_type):
         templates = {
             'node': '''FROM node:16-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-EXPOSE 8080
-CMD ["npm", "start"]''',
-            'python': '''FROM python:3.9-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 8080
-CMD ["python", "app.py"]'''
+            WORKDIR /app
+            COPY package*.json ./
+            RUN npm install
+            COPY . .
+            ENV PORT=3000
+            EXPOSE ${PORT}
+            CMD ["sh", "-c", "npm start -- --port ${PORT}"]''',
+                        'python': '''FROM python:3.9-slim
+            WORKDIR /app
+            COPY requirements.txt .
+            RUN pip install -r requirements.txt
+            COPY . .
+            ENV PORT=3000
+            EXPOSE ${PORT}
+            CMD ["sh", "-c", "python app.py --port ${PORT}"]'''
         }
         return templates[project_type]
