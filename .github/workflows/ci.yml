@@ -64,12 +64,12 @@ jobs:
       - name: Deploy to staging
         uses: appleboy/ssh-action@master
         with:
-          host: 15.235.184.251
+          host: 13.60.85.161
           username: ubuntu
           key: ${{ secrets.SSH_SHURULAPI_KEY }}
           script: |
-            source /home/moz/Shurulls/bin/activate
-            cd /home/moz/Shurulls/Shurull-API-Staging
+            source /home/ec2-user/Shurulls/bin/activate
+            cd /home/ec2-user/Shurulls/Shurull-API-Staging
             git fetch --all
             git reset --hard origin/develop
             docker-compose -f docker-compose.staging.yml down  # Stop and remove existing containers
@@ -83,12 +83,12 @@ jobs:
       - name: Deploy to production
         uses: appleboy/ssh-action@master
         with:
-          host: 15.235.184.251
-          username: moz
+          host: 13.60.85.161
+          username: ec2-user
           key: ${{ secrets.SSH_SHURULAPI_KEY }}
           script: |
-            source /home/moz/Shurulls/bin/activate
-            cd /home/moz/Shurulls/Shurull-API
+            source /home/ec2-user/Shurulls/bin/activate
+            cd /home/ec2-user/Shurulls/Shurull-API
             git fetch --all
             git reset --hard origin/main
             docker compose down  # Stop and remove existing containers
@@ -105,7 +105,7 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build # The build command of your project
+        run: npm run build
 
       - name: Push
         uses: s0/git-publish-subdir-action@develop
