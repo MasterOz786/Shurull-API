@@ -6,6 +6,14 @@ class DockerService:
     def __init__(self):
         self.client = docker.from_env()
         self.dockerfile_generator = DockerfileGenerator()
+        self.network_name = 'shurull_network'
+
+    def ensure_network(self):
+        """Ensure the Docker network exists"""
+        try:
+            self.client.networks.get(self.network_name)
+        except docker.errors.NotFound:
+            self.client.networks.create(self.network_name, driver='bridge')
 
     def build_image(self, project_path, deployment_id):
         # Generate appropriate Dockerfile based on project
@@ -19,24 +27,27 @@ class DockerService:
         return image
 
     def run_container(self, image_id, deployment_id, port):
-        # Create container with host networking
+        """
+        Run container with fixed internal port (5000) mapped to dynamic external port
+        """
+        self.ensure_network()
+        
         container = self.client.containers.run(
             image_id,
             detach=True,
-            network_mode="host",  # Use host networking
-            ports={f"{port}/tcp": port},  # Map container port to same host port
             name=f"api-deployment-{deployment_id}",
             environment={
-                "PORT": str(port),  # Pass port to container
+                "PORT": str(Config.CONTAINER_PORT),
                 "PROMETHEUS_MULTIPROC_DIR": "/tmp",
                 "prometheus_multiproc_dir": "/tmp"
-            }
+            },
+            networks=[self.network_name]
         )
         return container
 
     def get_container_url(self, deployment_id, port):
         """Generate the public URL for the deployed container"""
-        return f"{Config.DEPLOYMENT_URL}:{port}"
+        return f"{Config.DEPLOYMENT_AWS_URL}/{port}"
 
     def get_container_stats(self, container):
         stats = container.stats(stream=False)

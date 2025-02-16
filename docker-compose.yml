@@ -18,13 +18,9 @@ services:
       - ENVIRONMENT=development
       - DOCKER_HOST=unix:///var/run/docker.sock
       - SSH_AUTH_SOCK=/root/.ssh/auth.sock
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+      - PROMETHEUS_MULTIPROC_DIR=/tmp
+    networks:
+      - shurull_network
     deploy:
       resources:
         limits:
@@ -43,6 +39,8 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - shurull_network
 
   node-exporter:
     image: prom/node-exporter
@@ -53,6 +51,8 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+    networks:
+      - shurull_network
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor
@@ -65,3 +65,9 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
+    networks:
+      - shurull_network
+
+networks:
+  shurull_network:
+    driver: bridge
