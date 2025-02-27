@@ -130,7 +130,8 @@ export default function Deploy() {
   }, []);
 
   const deployFromGithub = useCallback(async (url, deploymentData) => {
-    const response = await fetch(`${import.meta.env.VITE_MAZDOORI_BASEURL}:${import.meta.env.VITE_FLASK_PORT}/deploy`, {
+//    const response = await fetch(`${import.meta.env.VITE_MAZDOORI_BASEURL}:${import.meta.env.VITE_FLASK_PORT}/deploy`, {
+	const response = await fetch('https://shurulls.pro/deploy', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -150,7 +151,8 @@ export default function Deploy() {
       formData.append(key, value);
     });
 
-    const response = await fetch(`${import.meta.env.VITE_MAZDOORI_BASEURL}:${import.meta.env.VITE_FLASK_PORT}/deploy`, {
+//    const response = await fetch(`${import.meta.env.VITE_MAZDOORI_BASEURL}:${import.meta.env.VITE_FLASK_PORT}/deploy`, {
+	const response = await fetch('https://shurulls.pro/deploy', {
       method: 'POST',
       body: formData,
     });

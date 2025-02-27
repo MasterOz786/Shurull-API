@@ -18,7 +18,7 @@ from mongodb_service import MongoDBService
 logger = setup_logger(__name__)
 
 app = Flask(__name__)
-CORS(app, origins=['https://shurulls.pro', '*'])
+CORS(app, origins=['https://shurulls.pro'])
 
 # Initialize services
 deployment_queue = DeploymentQueue()
